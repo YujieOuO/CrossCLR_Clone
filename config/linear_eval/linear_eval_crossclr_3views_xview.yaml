@@ -1,26 +1,26 @@
-work_dir: work_dir/linear_eval/1_model300
+work_dir: work_dir/
 # weights: weights/crossclr_3views_xview_frame50_channel16_cross150_epoch300.pt
-weights: work_dir/crossclr_3views/1_xview_frame50_channel16_epoch300_cross150/epoch300_model.pt
+weights: work_dir/epoch150_model.pt
 ignore_weights: [encoder_q.fc, encoder_q_motion.fc, encoder_q_bone.fc, encoder_k, encoder_k_motion, encoder_k_bone, queue, queue_motion, queue_bone]
 
 # feeder
 train_feeder: feeder.ntu_feeder.Feeder_single
 train_feeder_args:
-  data_path: data/NTU60_frame50/xview/train_position.npy
-  label_path: data/NTU-RGB-D/xview/train_label.pkl 
+  data_path: /home/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_data_joint.npy
+  label_path: /home/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_label.pkl
   shear_amplitude: -1
   temperal_padding_ratio: -1
   mmap: True
 test_feeder: feeder.ntu_feeder.Feeder_single
 test_feeder_args:
-  data_path: data/NTU60_frame50/xview/val_position.npy
-  label_path: data/NTU-RGB-D/xview/val_label.pkl 
+  data_path: /home/zhouyujie/skeleton/data/ntu60_frame50/xsub/val_data_joint.npy
+  label_path: /home/zhouyujie/skeleton/data/ntu60_frame50/xsub/val_label.pkl
   shear_amplitude: -1
   temperal_padding_ratio: -1
   mmap: True
 
 # model
-model: net.crossclr_3views.CrosSCLR
+model: net.skeletonclr.SkeletonCLR
 model_args:
   base_encoder: net.st_gcn.Model
   pretrain: False
@@ -51,7 +51,7 @@ device: [0]
 batch_size: 128
 test_batch_size: 128
 num_epoch: 100
-view: 'all'
+view: 'joint'
 
 # log
 save_interval: -1
