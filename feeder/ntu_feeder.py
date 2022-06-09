@@ -80,7 +80,8 @@ class Feeder_dual(torch.utils.data.Dataset):
         label = self.label[index]
         
         # processing
-        data1 = self._aug(data_numpy)
+        # data1 = self._aug(data_numpy)
+        data1 = data_numpy
         data2 = self._aug(data_numpy)
         return [data1, data2], label
 
