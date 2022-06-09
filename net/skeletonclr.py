@@ -9,7 +9,7 @@ class SkeletonCLR(nn.Module):
 
     def __init__(self, base_encoder=None, pretrain=True, feature_dim=2048, queue_size=32768,
                  momentum=0.999, Temperature=0.07, mlp=True, in_channels=3, hidden_channels=64,
-                 hidden_dim=256, num_class=60, dropout=0.5, lambd = 5e-4
+                 hidden_dim=256, num_class=60, dropout=0.5, lambd = 5e-4,
                  graph_args={'layout': 'ntu-rgb+d', 'strategy': 'spatial'},
                  edge_importance_weighting=True, **kwargs):
         """
