@@ -67,7 +67,9 @@ class SkeletonCLR(nn.Module):
 
         # compute query features
         feat1 = self.encoder_q(im_q)  # queries: NxC
+        feat1 = F.normalize(feat1, dim=1)
         feat2 = self.encoder_q(im_k)  # keys: NxC
+        feat2 = F.normalize(feat2, dim=1)
 
         feat1_norm = (feat1 - feat1.mean(0)) / feat1.std(0)
         feat2_norm = (feat2 - feat2.mean(0)) / feat2.std(0)

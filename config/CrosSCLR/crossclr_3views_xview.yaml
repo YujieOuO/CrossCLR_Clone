@@ -1,11 +1,11 @@
-work_dir: work/2
+work_dir: work/140/
 
 # feeder
 train_feeder: feeder.ntu_feeder.Feeder_dual
 train_feeder_args:
   data_path: '/home/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_data_joint.npy'
   label_path: '/home/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_label.pkl'
-  shear_amplitude: 0.5
+  shear_amplitude: 1
   temperal_padding_ratio: 6
   mmap: True
 
