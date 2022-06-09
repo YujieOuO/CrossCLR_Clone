@@ -82,10 +82,9 @@ class SkeletonCLR(nn.Module):
         on_diag = torch.diagonal(c).add_(-1).pow_(2).sum()
         off_diag = self.off_diagonal(c).pow_(2).sum()
 
-        print(on_diag)
-        print(off_diag)
-
-        BTloss = on_diag + self.lambd * off_diag
+        BTloss = on_diag +  off_diag
+        print(BTloss)
+        assert 1==0
 
         return BTloss
 
