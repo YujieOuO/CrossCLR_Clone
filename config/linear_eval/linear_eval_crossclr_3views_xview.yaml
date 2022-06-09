@@ -1,4 +1,4 @@
-work_dir: work_dir/2
+work_dir: work_dir/2/
 # weights: weights/crossclr_3views_xview_frame50_channel16_cross150_epoch300.pt
 weights: work/epoch150_model.pt
 ignore_weights: [encoder_q.fc, encoder_q_motion.fc, encoder_q_bone.fc, encoder_k, encoder_k_motion, encoder_k_bone, queue, queue_motion, queue_bone]
