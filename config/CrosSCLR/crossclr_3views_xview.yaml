@@ -44,10 +44,7 @@ num_epoch: 150
 start_epoch: 0
 
 # cross training
-topk: 1
 view: 'joint'
-cross_epoch: 150
-context: False
 
 # log
 save_interval: 5
