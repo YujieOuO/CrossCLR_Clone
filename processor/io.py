@@ -43,7 +43,6 @@ class IO():
             for k in default_arg.keys():
                 if k not in key:
                     print('Unknown Arguments: {}'.format(k))
-                    assert k in key
 
             parser.set_defaults(**default_arg)
 
