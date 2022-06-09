@@ -69,12 +69,7 @@ class SkeletonCLR_Processor(PT_Processor):
                 raise ValueError
 
             # forward
-            output, target = self.model(data1, data2)
-            if hasattr(self.model, 'module'):
-                self.model.module.update_ptr(output.size(0))
-            else:
-                self.model.update_ptr(output.size(0))
-            loss = self.loss(output, target)
+            loss = self.model(data1, data2)
 
             # backward
             self.optimizer.zero_grad()

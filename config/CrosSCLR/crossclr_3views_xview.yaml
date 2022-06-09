@@ -14,7 +14,7 @@ model: net.skeletonclr.SkeletonCLR
 model_args:
   base_encoder: net.st_gcn.Model
   pretrain: True
-  feature_dim: 128
+  feature_dim: 2048
   queue_size: 32768
   momentum: 0.999
   Temperature: 0.07
