@@ -14,7 +14,6 @@ model: net.skeletonclr.SkeletonCLR
 model_args:
   base_encoder: net.st_gcn.Model
   pretrain: True
-  lambd: 5e-4
   feature_dim: 2048
   queue_size: 32768
   momentum: 0.999

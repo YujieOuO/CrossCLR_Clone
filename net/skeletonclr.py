@@ -9,7 +9,7 @@ class SkeletonCLR(nn.Module):
 
     def __init__(self, base_encoder=None, pretrain=True, feature_dim=2048, queue_size=32768,
                  momentum=0.999, Temperature=0.07, mlp=True, in_channels=3, hidden_channels=64,
-                 hidden_dim=256, num_class=60, dropout=0.5, lambd = 5e-4,
+                 hidden_dim=256, num_class=60, dropout=0.5,
                  graph_args={'layout': 'ntu-rgb+d', 'strategy': 'spatial'},
                  edge_importance_weighting=True, **kwargs):
         """
@@ -21,7 +21,7 @@ class SkeletonCLR(nn.Module):
         super().__init__()
         base_encoder = import_class(base_encoder)
         self.pretrain = pretrain
-        self.lambd = lambd
+        self.lambd = 5e-4
 
         if not self.pretrain:
             self.encoder_q = base_encoder(in_channels=in_channels, hidden_channels=hidden_channels,
@@ -82,9 +82,7 @@ class SkeletonCLR(nn.Module):
         on_diag = torch.diagonal(c).add_(-1).pow_(2).sum()
         off_diag = self.off_diagonal(c).pow_(2).sum()
 
-        BTloss = on_diag +  off_diag
-        print(BTloss)
-        assert 1==0
+        BTloss = on_diag + self.lambd * off_diag
 
         return BTloss
 
