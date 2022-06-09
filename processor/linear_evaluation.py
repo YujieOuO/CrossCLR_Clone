@@ -147,7 +147,7 @@ class LE_Processor(Processor):
 
             # inference
             with torch.no_grad():
-                output = self.model(data, view=self.arg.view)
+                output = self.model(data)
             result_frag.append(output.data.cpu().numpy())
 
             # get loss
