@@ -113,7 +113,7 @@ class LE_Processor(Processor):
             label = label.long().to(self.dev, non_blocking=True)
 
             # forward
-            output = self.model(data, view=self.arg.view)
+            output = self.model(data)
             loss = self.loss(output, label)
 
             # backward
