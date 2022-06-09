@@ -89,8 +89,6 @@ class SkeletonCLR(nn.Module):
             im_k: a batch of key images
         """
 
-        if cross:
-            return self.cross_training(im_q, im_k, topk, context)
 
         if not self.pretrain:
             return self.encoder_q(im_q)

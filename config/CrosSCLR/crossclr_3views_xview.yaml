@@ -1,16 +1,16 @@
-work_dir: work_dir/crossclr_3views/1_xview_frame50_channel16_epoch300_cross150
+work_dir: work_dir/
 
 # feeder
 train_feeder: feeder.ntu_feeder.Feeder_dual
 train_feeder_args:
-  data_path: data/NTU60_frame50/xview/train_position.npy
-  label_path: data/NTU-RGB-D/xview/train_label.pkl 
+  data_path: '/home/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_data_joint.npy'
+  label_path: '/home/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_label.pkl'
   shear_amplitude: 0.5
   temperal_padding_ratio: 6
   mmap: True
 
 # model
-model: net.crossclr_3views.CrosSCLR
+model: net.skeletonclr.SkeletonCLR
 model_args:
   base_encoder: net.st_gcn.Model
   pretrain: True
@@ -40,14 +40,14 @@ step: [250]
 device: [0]
 batch_size: 128
 test_batch_size: 128
-num_epoch: 300
+num_epoch: 150
 start_epoch: 0
 
 # cross training
 topk: 1
-view: 'all'
+view: 'joint'
 cross_epoch: 150
-context: True
+context: False
 
 # log
 save_interval: 5
