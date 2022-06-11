@@ -39,8 +39,9 @@ class Feeder_single(torch.utils.data.Dataset):
         return data, label
 
     def _aug(self, data_numpy):
-        if self.temperal_padding_ratio > 0:
-            data_numpy = tools.temperal_crop(data_numpy, self.temperal_padding_ratio)
+        # if self.temperal_padding_ratio > 0:
+        #     data_numpy = tools.temperal_crop(data_numpy, self.temperal_padding_ratio)
+        data_numpy = tools.reverse(data_numpy)
 
         if self.shear_amplitude > 0:
             data_numpy = tools.shear(data_numpy, self.shear_amplitude)
@@ -80,14 +81,15 @@ class Feeder_dual(torch.utils.data.Dataset):
         label = self.label[index]
         
         # processing
-        data1 = self._aug(data_numpy)
         data1 = data_numpy
         data2 = self._aug(data_numpy)
         return [data1, data2], label
 
     def _aug(self, data_numpy):
-        if self.temperal_padding_ratio > 0:
-            data_numpy = tools.temperal_crop(data_numpy, self.temperal_padding_ratio)
+        # if self.temperal_padding_ratio > 0:
+        #     data_numpy = tools.temperal_crop(data_numpy, self.temperal_padding_ratio)
+
+        data_numpy = tools.reverse(data_numpy)
 
         if self.shear_amplitude > 0:
             data_numpy = tools.shear(data_numpy, self.shear_amplitude)
