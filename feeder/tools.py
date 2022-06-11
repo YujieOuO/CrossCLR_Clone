@@ -34,6 +34,6 @@ def reverse(data_numpy, p=0.5):
     if random.random() < p:
         time_range_order = [i for i in range(T)]
         time_range_reverse = list(reversed(time_range_order))
-        return temp[:, time_range_reverse, :, :]
+        return data_numpy[:, time_range_reverse, :, :]
     else:
-        return temp
+        return data_numpy
