@@ -29,7 +29,7 @@ def temperal_crop(data_numpy, temperal_padding_ratio=6):
 
 def reverse(data_numpy, p=0.5):
 
-    C, T, V, M = data.shape
+    C, T, V, M = data_numpy.shape
 
     if random.random() < p:
         time_range_order = [i for i in range(T)]
