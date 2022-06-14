@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import torch
 
 
 def shear(data_numpy, r=0.5):
@@ -40,7 +41,7 @@ def reverse(data_numpy, p=0.5):
 
 def motion_resample(data_numpy, max_frame=50, resample_frame=30):
 
-    temp = data_numpy
+    temp = torch.tensor(data_numpy)
     c, t, v, m = temp.shape
     motion = torch.zeros_like(temp)
     motion[:, :-1, :, :] = temp[:, 1:, :, :] - temp[:, :-1, :, :]
