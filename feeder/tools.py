@@ -58,4 +58,4 @@ def motion_resample(data_numpy, max_frame=50, resample_frame=30):
     output = output.squeeze(dim=-1)
     output = rearrange(output,'c (v m) t -> c t v m',c=c,v=v,m=m)
 
-    return output
+    return output.numpy()
