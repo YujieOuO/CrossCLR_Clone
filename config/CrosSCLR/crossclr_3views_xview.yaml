@@ -1,4 +1,4 @@
-work_dir: work/142/
+work_dir: work/143/
 
 # feeder
 train_feeder: feeder.ntu_feeder.Feeder_dual
