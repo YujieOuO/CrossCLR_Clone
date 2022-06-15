@@ -39,12 +39,12 @@ class Feeder_single(torch.utils.data.Dataset):
         return data, label
 
     def _aug(self, data_numpy):
-        # if self.temperal_padding_ratio > 0:
-        #     data_numpy = tools.temperal_crop(data_numpy, self.temperal_padding_ratio)
-        # data_numpy = tools.motion_resample(data_numpy)
+        if self.temperal_padding_ratio > 0:
+            data_numpy = tools.temperal_crop(data_numpy, self.temperal_padding_ratio)
+        data_numpy = tools.motion_resample(data_numpy)
 
-        # if self.shear_amplitude > 0:
-        #     data_numpy = tools.shear(data_numpy, self.shear_amplitude)
+        if self.shear_amplitude > 0:
+            data_numpy = tools.shear(data_numpy, self.shear_amplitude)
         
         return data_numpy
 
