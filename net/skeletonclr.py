@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchlight import import_class
-
+import random
 
 class SkeletonCLR(nn.Module):
     """ Referring to the code of MOCO, https://arxiv.org/abs/1911.05722 """
