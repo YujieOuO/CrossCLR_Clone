@@ -65,7 +65,7 @@ class SkeletonCLR(nn.Module):
         self.encoder_q.A = self.adj.clone()
         feat1 = self.encoder_q(im_q)  # queries: NxC
         feat1 = F.normalize(feat1, dim=1)
-        self.encoder_q.A = mask_adj(self.adj)
+        self.encoder_q.A = self.mask_adj(self.adj)
         feat2 = self.encoder_q(im_k)  # keys: NxC
         feat2 = F.normalize(feat2, dim=1)
 
