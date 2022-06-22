@@ -28,14 +28,14 @@ class SkeletonCLR(nn.Module):
                                           hidden_dim=hidden_dim, num_class=num_class,
                                           dropout=dropout, graph_args=graph_args,
                                           edge_importance_weighting=edge_importance_weighting,
-                                          **kwargs)
+                                          **kwargs).cuda()
         else:
 
             self.encoder_q = base_encoder(in_channels=in_channels, hidden_channels=hidden_channels,
                                           hidden_dim=hidden_dim, num_class=feature_dim,
                                           dropout=dropout, graph_args=graph_args,
                                           edge_importance_weighting=edge_importance_weighting,
-                                          **kwargs)
+                                          **kwargs).cuda()
 
             if mlp:  # hack: brute-force replacement
                 dim_mlp = self.encoder_q.fc.weight.shape[1]
@@ -47,7 +47,7 @@ class SkeletonCLR(nn.Module):
                                 nn.BatchNorm1d(feature_dim),
                                 nn.ReLU(),
                                 nn.Linear(feature_dim, feature_dim, bias=False),
-                            )
+                            ).cuda()
 
         self.adj = self.encoder_q.A
 
@@ -89,9 +89,9 @@ class SkeletonCLR(nn.Module):
         assert n == m
         return x.flatten()[:-1].view(n - 1, n + 1)[:, 1:].flatten()
 
-    def mask_adj(self, adj, mask_num):
+    def mask_adj(self, adj, mask_num=15):
         A = adj.clone()
-        ignore_joint = random.sample(range(25), mask_num)
+        ignore_joint = random.sample(range(25), mask_num=15)
         A[:,ignore_joint,:] = 0
         A[:,:,ignore_joint] = 0
         return A
