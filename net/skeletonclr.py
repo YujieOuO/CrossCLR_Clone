@@ -91,7 +91,7 @@ class SkeletonCLR(nn.Module):
 
     def mask_adj(self, adj, mask_num=15):
         A = adj.clone()
-        ignore_joint = random.sample(range(25), mask_num=15)
+        ignore_joint = random.sample(range(25), mask_num)
         A[:,ignore_joint,:] = 0
         A[:,:,ignore_joint] = 0
         return A
