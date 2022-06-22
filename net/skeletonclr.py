@@ -37,12 +37,6 @@ class SkeletonCLR(nn.Module):
                                           edge_importance_weighting=edge_importance_weighting,
                                           **kwargs)
 
-            self.encoder_k = base_encoder(in_channels=in_channels, hidden_channels=hidden_channels,
-                                          hidden_dim=hidden_dim, num_class=feature_dim,
-                                          dropout=dropout, graph_args=graph_args,
-                                          edge_importance_weighting=edge_importance_weighting,
-                                          **kwargs)
-
             if mlp:  # hack: brute-force replacement
                 dim_mlp = self.encoder_q.fc.weight.shape[1]
                 self.encoder_q.fc = nn.Sequential(
@@ -55,6 +49,8 @@ class SkeletonCLR(nn.Module):
                                 nn.Linear(feature_dim, feature_dim, bias=False),
                             )
 
+        self.adj = self.encoder_q.A
+
     def forward(self, im_q, im_k=None):
         """
         Input:
@@ -66,8 +62,10 @@ class SkeletonCLR(nn.Module):
             return self.encoder_q(im_q)
 
         # compute query features
+        self.encoder_q.A = self.adj.clone()
         feat1 = self.encoder_q(im_q)  # queries: NxC
         feat1 = F.normalize(feat1, dim=1)
+        self.encoder_q.A = mask_adj(self.adj)
         feat2 = self.encoder_q(im_k)  # keys: NxC
         feat2 = F.normalize(feat2, dim=1)
 
@@ -90,4 +88,11 @@ class SkeletonCLR(nn.Module):
         n, m = x.shape
         assert n == m
         return x.flatten()[:-1].view(n - 1, n + 1)[:, 1:].flatten()
+
+    def mask_adj(self, adj, mask_num):
+        A = adj.clone()
+        ignore_joint = random.sample(range(25), mask_num)
+        A[:,ignore_joint,:] = 0
+        A[:,:,ignore_joint] = 0
+        return A
         
