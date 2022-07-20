@@ -20,7 +20,7 @@ test_feeder_args:
   mmap: True
 
 # model
-model: net.skeletonclr.SkeletonCLR
+model: net.crossclr_3views.CrosSCLR
 model_args:
   base_encoder: net.st_gcn.Model
   pretrain: False
@@ -51,6 +51,7 @@ device: [0]
 batch_size: 128
 test_batch_size: 128
 num_epoch: 100
+view: 'all'
 
 # log
 save_interval: -1
