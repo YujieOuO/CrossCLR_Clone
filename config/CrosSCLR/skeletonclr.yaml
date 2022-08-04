@@ -1,20 +1,20 @@
 work_dir: work/skeletonclr/
 
 # feeder
-train_feeder: feeder.ntu_feeder.Feeder_dual
+train_feeder: feeder.ntu_feeder.Feeder_single
 train_feeder_args:
   data_path: '/mnt/lustre/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_data_joint.npy'
   label_path: '/mnt/lustre/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_label.pkl'
-  shear_amplitude: 1
+  shear_amplitude: 0.5
   temperal_padding_ratio: 6
   mmap: True
 
 # model
-model: net.skeletonclr.SkeletonCLR
+model: net.skeletonclr
 model_args:
   base_encoder: net.st_gcn.Model
   pretrain: True
-  feature_dim: 2048
+  feature_dim: 128
   queue_size: 32768
   momentum: 0.999
   Temperature: 0.07
@@ -37,13 +37,13 @@ optimizer: SGD
 step: [250]
 
 # training
-device: [7]
 batch_size: 128
 test_batch_size: 128
 num_epoch: 150
 start_epoch: 0
 
 # cross training
+topk: 1
 view: 'joint'
 
 # log
