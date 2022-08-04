@@ -19,4 +19,4 @@ srun -p ${PARTITION} \
     --kill-on-bad-exit=1 \
     --quotatype=auto \
     ${SRUN_ARGS} \
-    python -u main.py pretrain_skeletonclr --config config/linear_eval/linear_skeletonclr.yaml
+    python -u main.py linear_evaluation --config config/linear_eval/linear_skeletonclr.yaml
