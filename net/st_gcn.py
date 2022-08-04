@@ -5,7 +5,6 @@ import torch.nn.functional as F
 from net.utils.tgcn import ConvTemporalGraphical
 from net.utils.graph import Graph
 
-
 class Model(nn.Module):
     r"""Spatial temporal graph convolutional networks."""
 

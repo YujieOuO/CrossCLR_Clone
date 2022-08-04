@@ -81,6 +81,19 @@ class SkeletonCLR(nn.Module):
     def update_ptr(self, batch_size):
         assert self.K % batch_size == 0 #  for simplicity
         self.queue_ptr[0] = (self.queue_ptr[0] + batch_size) % self.K
+    
+    def central_spacial_mask(self, mask_joint):
+
+        # 度中心性 (Degree Centrality)
+        degree_centrality = [3, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 
+                            2, 2, 2, 1, 2, 2, 2, 1, 4, 1, 2, 1, 2]
+        all_joint = []
+        for i in range(25):
+            all_joint += [i]*degree_centrality[i]
+
+        ignore_joint = random.sample(all_joint, mask_joint)
+
+        return ignore_joint
 
     def forward(self, im_q, im_k=None, view='joint', cross=False, topk=1, context=False):
         """
@@ -89,14 +102,12 @@ class SkeletonCLR(nn.Module):
             im_k: a batch of key images
         """
 
-        if cross:
-            return self.cross_training(im_q, im_k, topk, context)
-
         if not self.pretrain:
             return self.encoder_q(im_q)
 
         # compute query features
-        q = self.encoder_q(im_q)  # queries: NxC
+        ignore_joint = self.central_spacial_mask(6)
+        q = self.encoder_q(im_q, ignore_joint)  # queries: NxC
         q = F.normalize(q, dim=1)
 
         # compute key features

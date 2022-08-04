@@ -29,33 +29,43 @@ def temperal_crop(data_numpy, temperal_padding_ratio=6):
     data_numpy = data_numpy[:, frame_start:frame_start + T]
     return data_numpy
 
-def reverse(data_numpy, p=0.5):
+def central_spacial_mask(mask_joint):
 
-    C, T, V, M = data_numpy.shape
+    # 度中心性 (Degree Centrality)
+    degree_centrality = [3, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 
+                        2, 2, 2, 1, 2, 2, 2, 1, 4, 1, 2, 1, 2]
+    all_joint = []
+    for i in range(25):
+        all_joint += [i]*degree_centrality[i]
 
-    if random.random() < p:
-        time_range_order = [i for i in range(T)]
-        time_range_reverse = list(reversed(time_range_order))
-        return data_numpy[:, time_range_reverse, :, :]
-    else:
-        return data_numpy
+    ignore_joint = random.sample(all_joint, mask_joint)
 
-def motion_resample(data_numpy, max_frame=50, resample_frame=30):
+    return ignore_joint
+    
+def motion_att_temp_mask(data, mask_frame):
 
-    temp = torch.tensor(data_numpy)
-    c, t, v, m = temp.shape
+    n, c, t, v, m = data.shape
+    temp = data.clone()
+    remain_num = t - mask_frame
+
+    ## 计算 motion_attention
     motion = torch.zeros_like(temp)
-    motion[:, :-1, :, :] = temp[:, 1:, :, :] - temp[:, :-1, :, :]
-    motion = motion**2
-    temporal_att = motion.mean((0,2,3))
-    _,temp_list = torch.topk(temporal_att, resample_frame)
-    temp_list,_ = torch.sort(temp_list.squeeze())
-    temp_list = repeat(temp_list,'t -> c t v m',c=c,v=v,m=m)
-    output = temp.gather(1,temp_list)#[n c 30 v m]
-    output = rearrange(output,'c t v m -> c (v m) t')
-    output = output[:, :, None]
-    output = F.interpolate(output, size=(max_frame, 1), mode='bilinear',align_corners=False)
-    output = output.squeeze(dim=-1)
-    output = rearrange(output,'c (v m) t -> c t v m',c=c,v=v,m=m)
+    motion[:, :, :-1, :, :] = temp[:, :, 1:, :, :] - temp[:, :, :-1, :, :]
+    # 用abs缓解特异点影响
+    motion = -(motion)**2
+    # 每一帧 c v m 维度中所有的att的和作为该帧的att
+    temporal_att = motion.mean((1,3,4))
 
-    return output.numpy()
+    ## 获取att最小的那些帧保留
+    _,temp_list = torch.topk(temporal_att, remain_num)
+    temp_list,_ = torch.sort(temp_list.squeeze())
+    temp_list = repeat(temp_list,'n t -> n c t v m',c=c,v=v,m=m)
+    temp_resample = temp.gather(2,temp_list)
+
+    ## 引入随机的temp mask
+    random_frame = random.sample(range(remain_num), remain_num-mask_frame)
+    random_frame.sort()
+    output = temp_resample[:, :, random_frame, :, :]
+
+    return output
+
