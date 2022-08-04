@@ -2,12 +2,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchlight import import_class
-import random
+
 
 class SkeletonCLR(nn.Module):
     """ Referring to the code of MOCO, https://arxiv.org/abs/1911.05722 """
 
-    def __init__(self, base_encoder=None, pretrain=True, feature_dim=2048, queue_size=32768,
+    def __init__(self, base_encoder=None, pretrain=True, feature_dim=128, queue_size=32768,
                  momentum=0.999, Temperature=0.07, mlp=True, in_channels=3, hidden_channels=64,
                  hidden_dim=256, num_class=60, dropout=0.5,
                  graph_args={'layout': 'ntu-rgb+d', 'strategy': 'spatial'},
@@ -21,78 +21,109 @@ class SkeletonCLR(nn.Module):
         super().__init__()
         base_encoder = import_class(base_encoder)
         self.pretrain = pretrain
-        self.lambd = 5e-4
 
         if not self.pretrain:
             self.encoder_q = base_encoder(in_channels=in_channels, hidden_channels=hidden_channels,
                                           hidden_dim=hidden_dim, num_class=num_class,
                                           dropout=dropout, graph_args=graph_args,
                                           edge_importance_weighting=edge_importance_weighting,
-                                          **kwargs).cuda()
+                                          **kwargs)
         else:
+            self.K = queue_size
+            self.m = momentum
+            self.T = Temperature
 
             self.encoder_q = base_encoder(in_channels=in_channels, hidden_channels=hidden_channels,
                                           hidden_dim=hidden_dim, num_class=feature_dim,
                                           dropout=dropout, graph_args=graph_args,
                                           edge_importance_weighting=edge_importance_weighting,
-                                          **kwargs).cuda()
+                                          **kwargs)
+            self.encoder_k = base_encoder(in_channels=in_channels, hidden_channels=hidden_channels,
+                                          hidden_dim=hidden_dim, num_class=feature_dim,
+                                          dropout=dropout, graph_args=graph_args,
+                                          edge_importance_weighting=edge_importance_weighting,
+                                          **kwargs)
 
             if mlp:  # hack: brute-force replacement
                 dim_mlp = self.encoder_q.fc.weight.shape[1]
-                self.encoder_q.fc = nn.Sequential(
-                                nn.Linear(dim_mlp, feature_dim, bias=False),
-                                nn.BatchNorm1d(feature_dim),
-                                nn.ReLU(),
-                                nn.Linear(feature_dim, feature_dim, bias=False),
-                                nn.BatchNorm1d(feature_dim),
-                                nn.ReLU(),
-                                nn.Linear(feature_dim, feature_dim, bias=False),
-                            ).cuda()
+                self.encoder_q.fc = nn.Sequential(nn.Linear(dim_mlp, dim_mlp),
+                                                  nn.ReLU(),
+                                                  self.encoder_q.fc)
+                self.encoder_k.fc = nn.Sequential(nn.Linear(dim_mlp, dim_mlp),
+                                                  nn.ReLU(),
+                                                  self.encoder_k.fc)
 
-        self.adj = self.encoder_q.A
+            for param_q, param_k in zip(self.encoder_q.parameters(), self.encoder_k.parameters()):
+                param_k.data.copy_(param_q.data)    # initialize
+                param_k.requires_grad = False       # not update by gradient
 
-    def forward(self, im_q, im_k=None):
+            # create the queue
+            self.register_buffer("queue", torch.randn(feature_dim, queue_size))
+            self.queue = F.normalize(self.queue, dim=0)
+            self.register_buffer("queue_ptr", torch.zeros(1, dtype=torch.long))
+
+    @torch.no_grad()
+    def _momentum_update_key_encoder(self):
+        """
+        Momentum update of the key encoder
+        """
+        for param_q, param_k in zip(self.encoder_q.parameters(), self.encoder_k.parameters()):
+            param_k.data = param_k.data * self.m + param_q.data * (1. - self.m)
+
+    @torch.no_grad()
+    def _dequeue_and_enqueue(self, keys):
+        batch_size = keys.shape[0]
+        ptr = int(self.queue_ptr)
+        gpu_index = keys.device.index
+        self.queue[:, (ptr + batch_size * gpu_index):(ptr + batch_size * (gpu_index + 1))] = keys.T
+
+    @torch.no_grad()
+    def update_ptr(self, batch_size):
+        assert self.K % batch_size == 0 #  for simplicity
+        self.queue_ptr[0] = (self.queue_ptr[0] + batch_size) % self.K
+
+    def forward(self, im_q, im_k=None, view='joint', cross=False, topk=1, context=False):
         """
         Input:
             im_q: a batch of query images
             im_k: a batch of key images
         """
 
+        if cross:
+            return self.cross_training(im_q, im_k, topk, context)
+
         if not self.pretrain:
             return self.encoder_q(im_q)
 
         # compute query features
-        self.encoder_q.A = self.adj.clone()
-        feat1 = self.encoder_q(im_q)  # queries: NxC
-        feat1 = F.normalize(feat1, dim=1)
-        self.encoder_q.A = self.mask_adj(self.adj)
-        feat2 = self.encoder_q(im_k)  # keys: NxC
-        feat2 = F.normalize(feat2, dim=1)
+        q = self.encoder_q(im_q)  # queries: NxC
+        q = F.normalize(q, dim=1)
 
-        feat1_norm = (feat1 - feat1.mean(0)) / feat1.std(0)
-        feat2_norm = (feat2 - feat2.mean(0)) / feat2.std(0)
+        # compute key features
+        with torch.no_grad():  # no gradient to keys
+            self._momentum_update_key_encoder()  # update the key encoder
 
-        N, D = feat1_norm.shape
-        c = feat1_norm.T @ feat2_norm
-        c.div_(N)
-        
-        on_diag = torch.diagonal(c).add_(-1).pow_(2).sum()
-        off_diag = self.off_diagonal(c).pow_(2).sum()
+            k = self.encoder_k(im_k)  # keys: NxC
+            k = F.normalize(k, dim=1)
 
-        BTloss = on_diag + self.lambd * off_diag
+        # compute logits
+        # Einstein sum is more intuitive
+        # positive logits: Nx1
+        l_pos = torch.einsum('nc,nc->n', [q, k]).unsqueeze(-1)
+        # negative logits: NxK
+        l_neg = torch.einsum('nc,ck->nk', [q, self.queue.clone().detach()])
 
-        return BTloss
+        # logits: Nx(1+K)
+        logits = torch.cat([l_pos, l_neg], dim=1)
 
-    def off_diagonal(self, x):
-        # return a flattened view of the off-diagonal elements of a square matrix
-        n, m = x.shape
-        assert n == m
-        return x.flatten()[:-1].view(n - 1, n + 1)[:, 1:].flatten()
+        # apply temperature
+        logits /= self.T
 
-    def mask_adj(self, adj, mask_num=15):
-        A = adj.clone()
-        ignore_joint = random.sample(range(25), mask_num)
-        A[:,ignore_joint,:] = 0
-        A[:,:,ignore_joint] = 0
-        return A
+        # labels: positive key indicators
+        labels = torch.zeros(logits.shape[0], dtype=torch.long).cuda()
+
+        # dequeue and enqueue
+        self._dequeue_and_enqueue(k)
+
+        return logits, labels
         
