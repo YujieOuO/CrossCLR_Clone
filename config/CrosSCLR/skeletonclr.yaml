@@ -10,7 +10,7 @@ train_feeder_args:
   mmap: True
 
 # model
-model: net.skeletonclr
+model: net.skeletonclr.SkeletonCLR
 model_args:
   base_encoder: net.st_gcn.Model
   pretrain: True
