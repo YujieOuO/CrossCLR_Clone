@@ -8,7 +8,7 @@ from .utils.graph import Graph
 class Model(nn.Module):
     r"""Spatial temporal graph convolutional networks."""
     
-    def __init__(self, in_channels, hidden_channels, hidden_dim, graph_args,
+    def __init__(self, in_channels, hidden_channels, hidden_dim, num_class, graph_args,
                  edge_importance_weighting, **kwargs):
         super().__init__()
 
@@ -34,7 +34,7 @@ class Model(nn.Module):
             st_gcn(hidden_channels * 4, hidden_channels * 4, kernel_size, 1, **kwargs),
             st_gcn(hidden_channels * 4, hidden_dim, kernel_size, 1, **kwargs),
         ))
-
+        self.fc = nn.Linear(hidden_dim, num_class)
         # initialize parameters for edge importance weighting
         if edge_importance_weighting:
             self.edge_importance = nn.ParameterList([
