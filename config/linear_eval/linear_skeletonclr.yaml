@@ -1,6 +1,6 @@
-work_dir: work/145/
-weights: weights/crossclr_3views_xview_frame50_channel16_cross150_epoch300.pt
-# weights: work/143/epoch150_model.pt
+work_dir: work/skeletonclr/val
+weights: /mnt/lustre/zhouyujie/CrossCLR_Clone/work/skeletonclr/epoch150_model.pt
+
 ignore_weights: [encoder_q.fc, encoder_q_motion.fc, encoder_q_bone.fc, encoder_k, encoder_k_motion, encoder_k_bone, queue, queue_motion, queue_bone]
 
 # feeder
@@ -20,7 +20,7 @@ test_feeder_args:
   mmap: True
 
 # model
-model: net.crossclr_3views.CrosSCLR
+model: net.skeletonclr.SkeletonCLR
 model_args:
   base_encoder: net.st_gcn.Model
   pretrain: False
@@ -47,11 +47,10 @@ optimizer: SGD
 step: [80]
 
 # training
-device: [0]
 batch_size: 128
 test_batch_size: 128
 num_epoch: 100
-view: 'all'
+view: 'joint'
 
 # log
 save_interval: -1
