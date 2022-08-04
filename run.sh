@@ -19,4 +19,4 @@ srun -p ${PARTITION} \
     --kill-on-bad-exit=1 \
     --quotatype=auto \
     ${SRUN_ARGS} \
-    python -u main.py pretrain_skeletonclr.py --config config/CrosSCLR/skeletonclr.yaml
+    python -u main.py pretrain_skeletonclr --config config/CrosSCLR/skeletonclr.yaml
