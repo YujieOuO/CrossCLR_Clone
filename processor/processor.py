@@ -94,7 +94,7 @@ class Processor(IO):
                 dataset=train_feeder(**self.arg.train_feeder_args),
                 batch_size=self.arg.batch_size,
                 shuffle=True,
-                pin_memory=True,    # set True when memory is abundant
+                pin_memory=False,    # set True when memory is abundant
                 num_workers=0,
                 drop_last=True,
                 worker_init_fn=init_seed)
@@ -105,7 +105,7 @@ class Processor(IO):
                 dataset=test_feeder(**self.arg.test_feeder_args),
                 batch_size=self.arg.test_batch_size,
                 shuffle=False,
-                pin_memory=True,
+                pin_memory=False,
                 num_workers=0,
                 drop_last=False,
                 worker_init_fn=init_seed)
