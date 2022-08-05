@@ -115,7 +115,7 @@ class SkeletonCLR(nn.Module):
         with torch.no_grad():  # no gradient to keys
             self._momentum_update_key_encoder()  # update the key encoder
 
-            k = self.encoder_k(im_k, ignore_joint)  # keys: NxC
+            k = self.encoder_k(im_k)  # keys: NxC
             k = F.normalize(k, dim=1)
 
         # compute logits
