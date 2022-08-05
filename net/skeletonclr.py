@@ -108,7 +108,7 @@ class SkeletonCLR(nn.Module):
 
         # compute query features
         ignore_joint = self.central_spacial_mask(2)
-        q = self.encoder_q(im_q)  # queries: NxC
+        q = self.encoder_q(im_q, ignore_joint)  # queries: NxC
         q = F.normalize(q, dim=1)
 
         # compute key features
