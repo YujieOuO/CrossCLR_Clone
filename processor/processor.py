@@ -95,7 +95,7 @@ class Processor(IO):
                 batch_size=self.arg.batch_size,
                 shuffle=True,
                 pin_memory=False,    # set True when memory is abundant
-                num_workers=0,
+                num_workers=4,
                 drop_last=True,
                 worker_init_fn=init_seed)
                 
@@ -106,7 +106,7 @@ class Processor(IO):
                 batch_size=self.arg.test_batch_size,
                 shuffle=False,
                 pin_memory=False,
-                num_workers=0,
+                num_workers=4,
                 drop_last=False,
                 worker_init_fn=init_seed)
 
