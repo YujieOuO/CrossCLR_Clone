@@ -1,4 +1,4 @@
-work_dir: work/spacial/skeletonclr
+work_dir: work/spacial/2k
 
 # feeder
 train_feeder: feeder.ntu_feeder.Feeder_dual
