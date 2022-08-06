@@ -1,4 +1,4 @@
-work_dir: work/spacial/2k
+work_dir: work/spacial/4k
 
 # feeder
 train_feeder: feeder.ntu_feeder.Feeder_dual
