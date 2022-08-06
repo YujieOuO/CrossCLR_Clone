@@ -17,7 +17,7 @@ model_args:
   feature_dim: 128
   queue_size: 32768
   momentum: 0.999
-  Temperature: 0.2
+  Temperature: 0.07
   mlp: True
   in_channels: 3
   hidden_channels: 16 # 1/4 x channels of standard stgcn
@@ -32,7 +32,7 @@ model_args:
 # optim
 nesterov: False
 weight_decay: 1e-4
-base_lr: 0.1
+base_lr: 0.01
 optimizer: SGD
 step: [250]
 
