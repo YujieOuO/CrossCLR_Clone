@@ -110,7 +110,7 @@ class SkeletonCLR(nn.Module):
         """
 
         # ignore_joint = random.sample(range(25), 10)
-        ignore_joint = [8,9,10,11,23,24,4,5,6,7,21,22,4,3,21]
+        ignore_joint = [16,17,18,19,12,13,14,15,1,2]
 
         if not self.pretrain:
             return self.encoder_q(im_q, ignore_joint)
