@@ -103,7 +103,7 @@ class SkeletonCLR(nn.Module):
             im_k: a batch of key images
         """
 
-        ignore_joint = random.sample(range(25), 4)
+        ignore_joint = random.sample(range(25), 6)
 
         if not self.pretrain:
             return self.encoder_q(im_q, ignore_joint)
