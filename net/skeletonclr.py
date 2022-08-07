@@ -103,11 +103,12 @@ class SkeletonCLR(nn.Module):
             im_k: a batch of key images
         """
 
+        ignore_joint = random.sample(range(25), 2)
+
         if not self.pretrain:
-            return self.encoder_q(im_q)
+            return self.encoder_q(im_q, ignore_joint)
 
         # compute query features
-        ignore_joint = self.central_spacial_mask(4)
         q = self.encoder_q(im_q)  # queries: NxC
         q = F.normalize(q, dim=1)
 
@@ -115,7 +116,7 @@ class SkeletonCLR(nn.Module):
         with torch.no_grad():  # no gradient to keys
             self._momentum_update_key_encoder()  # update the key encoder
 
-            k = self.encoder_k(im_k, ignore_joint)  # keys: NxC
+            k = self.encoder_k(im_k)  # keys: NxC
             k = F.normalize(k, dim=1)
 
         # compute logits
