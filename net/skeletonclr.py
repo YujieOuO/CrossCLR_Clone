@@ -96,6 +96,12 @@ class SkeletonCLR(nn.Module):
 
         return ignore_joint
 
+    def get_ignore_joint3(self):
+
+        upper = [8,9,10,11,23,24,4,5,6,7,21,22,4,3,21]
+        lower = [16,17,18,19,12,13,14,15,1,2]
+
+
     def forward(self, im_q, im_k=None, view='joint', cross=False, topk=1, context=False):
         """
         Input:
@@ -103,7 +109,8 @@ class SkeletonCLR(nn.Module):
             im_k: a batch of key images
         """
 
-        ignore_joint = random.sample(range(25), 10)
+        # ignore_joint = random.sample(range(25), 10)
+        ignore_joint = [8,9,10,11,23,24,4,5,6,7,21,22,4,3,21]
 
         if not self.pretrain:
             return self.encoder_q(im_q, ignore_joint)
