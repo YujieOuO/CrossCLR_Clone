@@ -1,4 +1,4 @@
-work_dir: work/spacial/skeletonclr/part1
+work_dir: work/spacial/skeletonclr/part2
 
 weights: /mnt/lustre/zhouyujie/CrossCLR_Clone/work/skeletonclr/epoch150_model.pt
 
