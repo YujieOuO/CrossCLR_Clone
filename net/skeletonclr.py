@@ -95,6 +95,20 @@ class SkeletonCLR(nn.Module):
         ignore_joint = random.sample(all_joint, mask_joint)
 
         return ignore_joint
+    def get_ignore_joint2(mask_part):
+
+        left_hand = [8,9,10,11,23,24]
+        right_hand = [4,5,6,7,21,22]
+        left_leg = [16,17,18,19]
+        right_leg = [12,13,14,15]
+        body = [0,1,2,3,20]
+        all_joint = [left_hand, right_hand, left_leg, right_leg, body]
+        part = random.sample(range(5), mask_part)
+        ignore_joint = []
+        for i in part:
+            ignore_joint += all_joint[i]
+
+        return ignore_joint
 
     def get_ignore_joint3(self):
 
@@ -110,7 +124,7 @@ class SkeletonCLR(nn.Module):
         """
 
         # ignore_joint = random.sample(range(25), 10)
-        ignore_joint = [16,17,18,19,12,13,14,15,1,2]
+        ignore_joint = get_ignore_joint2(1)
 
         if not self.pretrain:
             return self.encoder_q(im_q, ignore_joint)
