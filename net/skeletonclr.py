@@ -95,7 +95,7 @@ class SkeletonCLR(nn.Module):
         ignore_joint = random.sample(all_joint, mask_joint)
 
         return ignore_joint
-        
+
     def get_ignore_joint2(self, mask_part):
 
         left_hand = [8,9,10,11,23,24]
@@ -113,8 +113,8 @@ class SkeletonCLR(nn.Module):
 
     def get_ignore_joint3(self):
 
-        upper = [8,9,10,11,23,24,4,5,6,7,21,22,4,3,21]
-        lower = [16,17,18,19,12,13,14,15,1,2]
+        upper = [23,24,11,10,9,8,3,2,20,4,5,6,7,21,22]
+        lower = [0,1,12,13,14,15,16,17,18,19]
 
         ignore_joint = upper
 
