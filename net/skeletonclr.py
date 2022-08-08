@@ -116,7 +116,7 @@ class SkeletonCLR(nn.Module):
         upper = [23,24,11,10,9,8,3,2,20,4,5,6,7,21,22]
         lower = [0,1,12,13,14,15,16,17,18,19]
 
-        ignore_joint = upper
+        ignore_joint = lower
 
         return ignore_joint
 
