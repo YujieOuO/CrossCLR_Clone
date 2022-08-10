@@ -18,8 +18,8 @@ class Feeder_single(torch.utils.data.Dataset):
     def load_data(self, mmap):
         # load label
         with open(self.label_path, 'rb') as f:
-            self.sample_name, self.label = pickle.load(f)
-
+            # self.sample_name, self.label = pickle.load(f)
+            self.label = pickle.load(f)
         # load data
         if mmap:
             self.data = np.load(self.data_path, mmap_mode='r')
