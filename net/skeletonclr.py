@@ -132,7 +132,7 @@ class SkeletonCLR(nn.Module):
         # ignore_joint = self.get_ignore_joint3()
 
         if not self.pretrain:
-            im_q = im_q[:, :, :25, :, :]
+            im_q = im_q[:, :, :35, :, :]
             return self.encoder_q(im_q)
 
         # compute query features
