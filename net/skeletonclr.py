@@ -129,10 +129,10 @@ class SkeletonCLR(nn.Module):
         """
 
         # ignore_joint = random.sample(range(25), 10)
-        ignore_joint = self.get_ignore_joint3()
+        # ignore_joint = self.get_ignore_joint3()
 
         if not self.pretrain:
-            return self.encoder_q(im_q, ignore_joint)
+            return self.encoder_q(im_q)
 
         # compute query features
         q = self.encoder_q(im_q)  # queries: NxC
