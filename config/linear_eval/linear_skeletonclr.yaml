@@ -7,19 +7,19 @@ ignore_weights: [encoder_q.fc, encoder_q_motion.fc, encoder_q_bone.fc, encoder_k
 # feeder
 train_feeder: feeder.ntu_feeder.Feeder_single
 train_feeder_args:
-  # data_path: /mnt/lustre/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_data_joint.npy
-  # label_path: /mnt/lustre/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_label.pkl
-  data_path: /mnt/lustre/zhouyujie/skeleton/data/upper/up_train_data.npy
-  label_path: /mnt/lustre/zhouyujie/skeleton/data/upper/up_train_label.pkl
+  data_path: /mnt/lustre/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_data_joint.npy
+  label_path: /mnt/lustre/zhouyujie/skeleton/data/ntu60_frame50/xsub/train_label.pkl
+  # data_path: /mnt/lustre/zhouyujie/skeleton/data/upper/up_train_data.npy
+  # label_path: /mnt/lustre/zhouyujie/skeleton/data/upper/up_train_label.pkl
   shear_amplitude: -1
   temperal_padding_ratio: -1
   mmap: True
 test_feeder: feeder.ntu_feeder.Feeder_single
 test_feeder_args:
-  # data_path: /mnt/lustre/zhouyujie/skeleton/data/ntu60_frame50/xsub/val_data_joint.npy
-  # label_path: /mnt/lustre/zhouyujie/skeleton/data/ntu60_frame50/xsub/val_label.pkl
-  data_path: /mnt/lustre/zhouyujie/skeleton/data/upper/up_test_data.npy
-  label_path: /mnt/lustre/zhouyujie/skeleton/data/upper/up_test_label.pkl
+  data_path: /mnt/lustre/zhouyujie/skeleton/data/ntu60_frame50/xsub/val_data_joint.npy
+  label_path: /mnt/lustre/zhouyujie/skeleton/data/ntu60_frame50/xsub/val_label.pkl
+  # data_path: /mnt/lustre/zhouyujie/skeleton/data/upper/up_test_data.npy
+  # label_path: /mnt/lustre/zhouyujie/skeleton/data/upper/up_test_label.pkl
   shear_amplitude: -1
   temperal_padding_ratio: -1
   mmap: True
