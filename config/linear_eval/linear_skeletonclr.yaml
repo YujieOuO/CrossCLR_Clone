@@ -37,7 +37,7 @@ model_args:
   in_channels: 3
   hidden_channels: 16
   hidden_dim: 256
-  num_class: 44
+  num_class: 60
   dropout: 0.5
   graph_args:
     layout: 'ntu-rgb+d'
