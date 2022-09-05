@@ -106,24 +106,25 @@ class SkeletonCLR(nn.Module):
         ignore_joint = self.central_spacial_mask()
 
         # compute query features
-        q = self.encoder_q(im_q)  # queries: NxC
-        q = F.normalize(q, dim=1)
-
+        q1 = self.encoder_q(im_q)  # queries: NxC
+        q1 = F.normalize(q1, dim=1)
+        q2 = self.encoder_q(im_q, ignore_joint)
+        q2 = F.normalize(q2, dim=1)
         # compute key features
         with torch.no_grad():  # no gradient to keys
             self._momentum_update_key_encoder()  # update the key encoder
 
             k1 = self.encoder_k(im_k)  # keys: NxC
             k1 = F.normalize(k1, dim=1)
-            k2 = self.encoder_k(im_k, ignore_joint)
-            k2 = F.normalize(k2, dim=1)
+            # k2 = self.encoder_k(im_k, ignore_joint)
+            # k2 = F.normalize(k2, dim=1)
 
         # compute logits
         # Einstein sum is more intuitive
         # positive logits: Nx1
-        l_pos = torch.einsum('nc,nc->n', [q, k2]).unsqueeze(-1)
+        l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
         # negative logits: NxK
-        l_neg = torch.einsum('nc,ck->nk', [q, self.queue.clone().detach()])
+        l_neg = torch.einsum('nc,ck->nk', [q1, self.queue.clone().detach()])
 
         # logits: Nx(1+K)
         logits = torch.cat([l_pos, l_neg], dim=1)
