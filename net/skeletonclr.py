@@ -128,11 +128,10 @@ class SkeletonCLR(nn.Module):
             im_k: a batch of key images
         """
 
-        # ignore_joint = random.sample(range(25), 10)
-        # ignore_joint = self.get_ignore_joint3()
+        if cross:
+            return self.cross_training(im_q, im_k, topk, context)
 
         if not self.pretrain:
-            im_q = im_q[:, :, :30, :, :]
             return self.encoder_q(im_q)
 
         # compute query features
