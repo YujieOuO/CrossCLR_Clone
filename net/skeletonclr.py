@@ -115,7 +115,7 @@ class SkeletonCLR(nn.Module):
 
             k1 = self.encoder_k(im_k)  # keys: NxC
             k1 = F.normalize(k1, dim=1)
-            k2 = self.encdoer_k(im_k, ignore_joint)
+            k2 = self.encoder_k(im_k, ignore_joint)
             k2 = F.normalize(k2, dim=1)
 
         # compute logits
