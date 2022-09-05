@@ -17,7 +17,7 @@ srun -p ${PARTITION} \
     --ntasks-per-node=${GPUS_PER_NODE} \
     --cpus-per-task=${CPUS_PER_TASK} \
     --kill-on-bad-exit=1 \
-    --quotatype=auto \
+    --quotatype=reserved \
     -x SH-IDC1-10-140-0-150\
     ${SRUN_ARGS} \
     python -u main.py pretrain_skeletonclr --config config/CrosSCLR/skeletonclr.yaml
