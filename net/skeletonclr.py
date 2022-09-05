@@ -91,35 +91,9 @@ class SkeletonCLR(nn.Module):
         all_joint = []
         for i in range(25):
             all_joint += [i]*degree_centrality[i]
-
         ignore_joint = random.sample(all_joint, mask_joint)
 
         return ignore_joint
-
-    def get_ignore_joint2(self, mask_part):
-
-        left_hand = [8,9,10,11,23,24]
-        right_hand = [4,5,6,7,21,22]
-        left_leg = [16,17,18,19]
-        right_leg = [12,13,14,15]
-        body = [0,1,2,3,20]
-        all_joint = [left_hand, right_hand, left_leg, right_leg, body]
-        part = random.sample(range(5), mask_part)
-        ignore_joint = []
-        for i in part:
-            ignore_joint += all_joint[i]
-
-        return ignore_joint
-
-    def get_ignore_joint3(self):
-
-        upper = [23,24,11,10,9,8,3,2,20,4,5,6,7,21,22]
-        lower = [0,1,12,13,14,15,16,17,18,19]
-
-        ignore_joint = lower
-
-        return ignore_joint
-
 
     def forward(self, im_q, im_k=None, view='joint', cross=False, topk=1, context=False):
         """
@@ -127,10 +101,6 @@ class SkeletonCLR(nn.Module):
             im_q: a batch of query images
             im_k: a batch of key images
         """
-
-        if cross:
-            return self.cross_training(im_q, im_k, topk, context)
-
         if not self.pretrain:
             return self.encoder_q(im_q)
 
