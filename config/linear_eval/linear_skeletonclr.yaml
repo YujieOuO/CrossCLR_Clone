@@ -1,4 +1,4 @@
-work_dir: work/result/2
+work_dir: work/result/1
 
 weights: /mnt/lustre/zhouyujie/CrossCLR_Clone/work/pretrain1/epoch150_model.pt
 
