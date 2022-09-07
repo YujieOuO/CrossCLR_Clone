@@ -32,14 +32,14 @@ model_args:
 # optim
 nesterov: False
 weight_decay: 1e-4
-base_lr: 0.01
+base_lr: 0.1
 optimizer: SGD
 step: [250]
 
 # training
 batch_size: 128
 test_batch_size: 128
-num_epoch: 150
+num_epoch: 300
 start_epoch: 0
 
 # cross training
