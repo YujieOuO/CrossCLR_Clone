@@ -1,4 +1,4 @@
-work_dir: work/pretrain6/
+work_dir: work/pretrain0/
 
 # feeder
 train_feeder: feeder.ntu_feeder.Feeder_dual
@@ -17,8 +17,7 @@ model_args:
   feature_dim: 128
   queue_size: 32768
   momentum: 0.999
-  # Temperature: 0.07
-  Temperature: 0.04
+  Temperature: 0.2
   mlp: True
   in_channels: 3
   hidden_channels: 16 # 1/4 x channels of standard stgcn
