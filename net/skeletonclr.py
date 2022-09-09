@@ -116,13 +116,13 @@ class SkeletonCLR(nn.Module):
 
             k1 = self.encoder_k(im_k)  # keys: NxC
             k1 = F.normalize(k1, dim=1)
-            k2 = self.encoder_k(im_k, ignore_joint)
-            k2 = F.normalize(k2, dim=1)
+            # k2 = self.encoder_k(im_k, ignore_joint)
+            # k2 = F.normalize(k2, dim=1)
 
         # compute logits
         # Einstein sum is more intuitive
         # positive logits: Nx1
-        l_pos = torch.einsum('nc,nc->n', [q1, k2]).unsqueeze(-1)
+        l_pos = torch.einsum('nc,nc->n', [q1, k1]).unsqueeze(-1)
         # negative logits: NxK
         l_neg = torch.einsum('nc,ck->nk', [q1, self.queue.clone().detach()])
 
