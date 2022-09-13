@@ -71,9 +71,9 @@ class SkeletonCLR_Processor(PT_Processor):
             # forward
             output0, output1, target = self.model(data1, data2)
             if hasattr(self.model, 'module'):
-                self.model.module.update_ptr(output.size(0))
+                self.model.module.update_ptr(output0.size(0))
             else:
-                self.model.update_ptr(output.size(0))
+                self.model.update_ptr(output0.size(0))
             loss0 = self.loss(output0, target)
             loss1 = self.loss(output1, target)
 
