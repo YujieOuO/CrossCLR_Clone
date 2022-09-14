@@ -121,13 +121,18 @@ class SkeletonCLR(nn.Module):
         logits /= self.T
         logit_0 = logits
 
+        with torch.no_grad():  # no gradient to keys
+            # self._momentum_update_key_encoder()  # update the key encoder
+            k2 = self.encoder_k(im_k, ignore_joint)  # keys: NxC
+            k2 = F.normalize(k2, dim=1)
+
         #CSM
-        q2 = self.encoder_q(im_q, ignore_joint)
-        q2 = F.normalize(q2, dim=1)
+        # q2 = self.encoder_q(im_q, ignore_joint)
+        # q2 = F.normalize(q2, dim=1)
 
         # CSM infonce
-        l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
-        l_neg = torch.einsum('nc,ck->nk', [q2, self.queue.clone().detach()])
+        l_pos = torch.einsum('nc,nc->n', [q1, k2]).unsqueeze(-1)
+        l_neg = torch.einsum('nc,ck->nk', [q1, self.queue.clone().detach()])
         logits = torch.cat([l_pos, l_neg], dim=1)
         logits /= self.T
         logit_1 = logits
