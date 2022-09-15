@@ -96,7 +96,7 @@ class SkeletonCLR(nn.Module):
 
         return ignore_joint
 
-    def motion_att_temp_mask(self, data, mask_frame=10):
+    def motion_att_temp_mask(self, data, mask_frame=12):
 
         n, c, t, v, m = data.shape
         temp = data.clone()
