@@ -83,7 +83,7 @@ class SkeletonCLR(nn.Module):
         assert self.K % batch_size == 0 #  for simplicity
         self.queue_ptr[0] = (self.queue_ptr[0] + batch_size) % self.K
     
-    def central_spacial_mask(self, mask_joint=8):
+    def central_spacial_mask(self, mask_joint=10):
 
         # 度中心性 (Degree Centrality)
         degree_centrality = [3, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 
