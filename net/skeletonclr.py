@@ -95,6 +95,32 @@ class SkeletonCLR(nn.Module):
 
         return ignore_joint
 
+    def motion_att_temp_mask(self, data, mask_frame=6):
+
+        n, c, t, v, m = data.shape
+        temp = data.clone()
+        remain_num = t - mask_frame
+
+        ## 计算 motion_attention
+        motion = torch.zeros_like(temp)
+        motion[:, :, :-1, :, :] = temp[:, :, 1:, :, :] - temp[:, :, :-1, :, :]
+        motion = -(motion)**2
+        # 每一帧 c v m 维度中所有的att的和作为该帧的att
+        temporal_att = motion.mean((1,3,4))
+
+        ## 获取att最小的那些帧保留
+        _,temp_list = torch.topk(temporal_att, remain_num)
+        temp_list,_ = torch.sort(temp_list.squeeze())
+        temp_list = repeat(temp_list,'n t -> n c t v m',c=c,v=v,m=m)
+        temp_resample = temp.gather(2,temp_list)
+
+        ## 引入随机的temp mask
+        random_frame = random.sample(range(remain_num), remain_num-mask_frame)
+        random_frame.sort()
+        output = temp_resample[:, :, random_frame, :, :]
+
+        return output
+
     def forward(self, im_q, im_k=None, view='joint', cross=False, topk=1, context=False):
         """
         Input:
@@ -121,18 +147,25 @@ class SkeletonCLR(nn.Module):
         logits /= self.T
         logit_0 = logits
 
-        #CSM
-        q2 = self.encoder_q(im_q, ignore_joint)
-        q2 = F.normalize(q2, dim=1)
+        # # CSM
+        # q2 = self.encoder_q(im_q, ignore_joint)
+        # q2 = F.normalize(q2, dim=1)
+        # l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
+        # l_neg = torch.einsum('nc,ck->nk', [q2, self.queue.clone().detach()])
+        # logits = torch.cat([l_pos, l_neg], dim=1)
+        # logits /= self.T
+        # logit_1 = logits
 
-        # CSM infonce
+        # MATM
+        im_q = self.motion_att_temp_mask(im_q)
+        q2 = self.encoder_q(im_q)
+        q2 = F.normalize(q2, dim=1)
         l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
         l_neg = torch.einsum('nc,ck->nk', [q2, self.queue.clone().detach()])
         logits = torch.cat([l_pos, l_neg], dim=1)
         logits /= self.T
-        logit_1 = logits
+        logit_1 = logits        
 
         labels = torch.zeros(logits.shape[0], dtype=torch.long).cuda()
         self._dequeue_and_enqueue(k1)
-
         return logit_0, logit_1, labels
