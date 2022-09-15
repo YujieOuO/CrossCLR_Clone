@@ -57,10 +57,10 @@ class IO():
 
         # gpu
         if self.arg.use_gpu:
-            gpus = torchlight.visible_gpu(self.arg.device)
-            torchlight.occupy_gpu(gpus)
-            self.gpus = gpus
-            self.dev = "cuda:0"
+            # gpus = torchlight.visible_gpu(self.arg.device)
+            # torchlight.occupy_gpu(gpus)
+            # self.gpus = gpus
+            self.dev = "cuda"
         else:
             self.dev = "cpu"
 
