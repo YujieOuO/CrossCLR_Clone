@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchlight import import_class
 import random
+from einops import rearrange, repeat
 
 
 class SkeletonCLR(nn.Module):
