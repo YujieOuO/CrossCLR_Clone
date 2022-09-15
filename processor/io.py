@@ -81,10 +81,6 @@ class IO():
             if cls_name.find('torch.nn.modules') != -1:
                 setattr(self, name, value.to(self.dev))
 
-        # model parallel
-        if self.arg.use_gpu and len(self.gpus) > 1:
-            self.model = nn.DataParallel(self.model, device_ids=self.gpus)
-
     def start(self):
         self.io.print_log('Parameters:\n{}\n'.format(str(vars(self.arg))))
 
