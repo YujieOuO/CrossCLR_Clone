@@ -162,7 +162,7 @@ class SkeletonCLR(nn.Module):
         q2 = self.encoder_q(im_q)
         q2 = F.normalize(q2, dim=1)
         l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
-        l_neg = torch.einsum('nc,ck->nk', [q2, self.queue.clone().detach()])
+        l_neg = torch.einsum('nc,ck->nk', [q1, self.queue.clone().detach()])
         logits = torch.cat([l_pos, l_neg], dim=1)
         logits /= self.T
         logit_1 = logits        
