@@ -84,7 +84,7 @@ class SkeletonCLR(nn.Module):
         assert self.K % batch_size == 0 #  for simplicity
         self.queue_ptr[0] = (self.queue_ptr[0] + batch_size) % self.K
     
-    def central_spacial_mask(self, mask_joint=6):
+    def central_spacial_mask(self, mask_joint):
 
         # 度中心性 (Degree Centrality)
         degree_centrality = [3, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 
@@ -130,7 +130,7 @@ class SkeletonCLR(nn.Module):
         """
         if not self.pretrain:
             return self.encoder_q(im_q)
-        ignore_joint = self.central_spacial_mask()
+        ignore_joint = self.central_spacial_mask(mask_joint=12)
 
         # compute query features
         q1 = self.encoder_q(im_q)  # queries: NxC
@@ -148,24 +148,24 @@ class SkeletonCLR(nn.Module):
         logits /= self.T
         logit_0 = logits
 
-        # # CSM
-        # q2 = self.encoder_q(im_q, ignore_joint)
+        # CSM
+        q2 = self.encoder_q(im_q, ignore_joint)
+        q2 = F.normalize(q2, dim=1)
+        l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
+        l_neg = torch.einsum('nc,ck->nk', [q2, self.queue.clone().detach()])
+        logits = torch.cat([l_pos, l_neg], dim=1)
+        logits /= self.T
+        logit_1 = logits
+
+        # # MATM
+        # im_q = self.motion_att_temp_mask(im_q)
+        # q2 = self.encoder_q(im_q)
         # q2 = F.normalize(q2, dim=1)
         # l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
         # l_neg = torch.einsum('nc,ck->nk', [q2, self.queue.clone().detach()])
         # logits = torch.cat([l_pos, l_neg], dim=1)
         # logits /= self.T
-        # logit_1 = logits
-
-        # MATM
-        im_q = self.motion_att_temp_mask(im_q)
-        q2 = self.encoder_q(im_q)
-        q2 = F.normalize(q2, dim=1)
-        l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
-        l_neg = torch.einsum('nc,ck->nk', [q1, self.queue.clone().detach()])
-        logits = torch.cat([l_pos, l_neg], dim=1)
-        logits /= self.T
-        logit_1 = logits        
+        # logit_1 = logits        
 
         labels = torch.zeros(logits.shape[0], dtype=torch.long).cuda()
         self._dequeue_and_enqueue(k1)
