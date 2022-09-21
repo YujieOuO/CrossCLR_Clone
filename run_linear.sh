@@ -17,6 +17,7 @@ srun -p ${PARTITION} \
     --ntasks-per-node=${GPUS_PER_NODE} \
     --cpus-per-task=${CPUS_PER_TASK} \
     --kill-on-bad-exit=1 \
-    --quotatype=spot \
+    --quotatype=auto \
+    -x SH-IDC1-10-140-0-229\
     ${SRUN_ARGS} \
     python -u main.py linear_evaluation --config config/linear_eval/linear_skeletonclr.yaml
