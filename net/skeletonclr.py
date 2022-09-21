@@ -130,7 +130,7 @@ class SkeletonCLR(nn.Module):
         """
         if not self.pretrain:
             return self.encoder_q(im_q)
-        ignore_joint = self.central_spacial_mask(mask_joint=9)
+        ignore_joint = self.central_spacial_mask(mask_joint=10)
 
         # compute query features
         q1 = self.encoder_q(im_q)  # queries: NxC
