@@ -132,7 +132,8 @@ class SkeletonCLR(nn.Module):
             return self.encoder_q(im_q)
         ignore_joint = self.central_spacial_mask(mask_joint=10)
 
-        # compute query features
+        # MATM
+        im_q = motion_att_temp_mask(im_q)
         q1 = self.encoder_q(im_q)  # queries: NxC
         q1 = F.normalize(q1, dim=1)
 
@@ -155,17 +156,7 @@ class SkeletonCLR(nn.Module):
         l_neg = torch.einsum('nc,ck->nk', [q2, self.queue.clone().detach()])
         logits = torch.cat([l_pos, l_neg], dim=1)
         logits /= self.T
-        logit_1 = logits
-
-        # # MATM
-        # im_q = self.motion_att_temp_mask(im_q)
-        # q2 = self.encoder_q(im_q)
-        # q2 = F.normalize(q2, dim=1)
-        # l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
-        # l_neg = torch.einsum('nc,ck->nk', [q2, self.queue.clone().detach()])
-        # logits = torch.cat([l_pos, l_neg], dim=1)
-        # logits /= self.T
-        # logit_1 = logits        
+        logit_1 = logits  
 
         labels = torch.zeros(logits.shape[0], dtype=torch.long).cuda()
         self._dequeue_and_enqueue(k1)

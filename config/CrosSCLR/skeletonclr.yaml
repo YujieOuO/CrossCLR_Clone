@@ -1,4 +1,4 @@
-work_dir: work/pretrain21/
+work_dir: work/pretrain25/
 
 # feeder
 train_feeder: feeder.ntu_feeder.Feeder_dual
@@ -32,7 +32,7 @@ model_args:
 # optim
 nesterov: False
 weight_decay: 1e-4
-base_lr: 0.005
+base_lr: 0.01
 optimizer: SGD
 step: [250]
 
