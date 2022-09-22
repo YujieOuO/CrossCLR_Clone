@@ -133,7 +133,8 @@ class SkeletonCLR(nn.Module):
         ignore_joint = self.central_spacial_mask(mask_joint=10)
 
         # MATM
-        im_q = self.motion_att_temp_mask(im_q)
+        if random.random() < 0.5:
+            im_q = self.motion_att_temp_mask(im_q)
         q1 = self.encoder_q(im_q)  # queries: NxC
         q1 = F.normalize(q1, dim=1)
 
