@@ -132,12 +132,8 @@ class SkeletonCLR(nn.Module):
             return self.encoder_q(im_q)
         ignore_joint = self.central_spacial_mask(mask_joint=10)
 
-        # MATM
-        if random.random() < 0.5:
-            im_q = self.motion_att_temp_mask(im_q)
         q1 = self.encoder_q(im_q)  # queries: NxC
         q1 = F.normalize(q1, dim=1)
-
         with torch.no_grad():  # no gradient to keys
             self._momentum_update_key_encoder()  # update the key encoder
             k1 = self.encoder_k(im_k)  # keys: NxC
@@ -151,6 +147,7 @@ class SkeletonCLR(nn.Module):
         logit_0 = logits
 
         # CSM
+        im_q = motion_att_temp_mask(im_q)
         q2 = self.encoder_q(im_q, ignore_joint)
         q2 = F.normalize(q2, dim=1)
         l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
