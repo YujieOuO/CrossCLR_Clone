@@ -147,7 +147,8 @@ class SkeletonCLR(nn.Module):
         logit_0 = logits
 
         # CSM
-        im_q = motion_att_temp_mask(im_q)
+        if random.random() < 0.5:
+            im_q = motion_att_temp_mask(im_q)
         q2 = self.encoder_q(im_q, ignore_joint)
         q2 = F.normalize(q2, dim=1)
         l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
