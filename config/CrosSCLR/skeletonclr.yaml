@@ -1,4 +1,4 @@
-work_dir: work/pretrain32/
+work_dir: work/pretrain33/
 
 # feeder
 train_feeder: feeder.ntu_feeder.Feeder_dual
