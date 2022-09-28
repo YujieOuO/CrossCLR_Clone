@@ -142,11 +142,11 @@ class SkeletonCLR(nn.Module):
             return self.encoder_q(im_q)
         ignore_joint = self.central_spacial_mask(mask_joint=10)
 
-        if random.random()>0.5:
-            input_q = self.motion_att_temp_mask(im_q)
-        else:
-            input_q = im_q
-        # input_q = self.motion_att_temp_mask(im_q)
+        # if random.random()>0.5:
+        #     input_q = self.motion_att_temp_mask(im_q)
+        # else:
+        #     input_q = im_q
+        input_q = self.motion_att_temp_mask(im_q)
         q1 = self.encoder_q(input_q)  # queries: NxC
         q1 = F.normalize(q1, dim=1)
         with torch.no_grad():  # no gradient to keys
