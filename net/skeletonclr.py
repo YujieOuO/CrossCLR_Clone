@@ -96,7 +96,7 @@ class SkeletonCLR(nn.Module):
 
         return ignore_joint
 
-    def motion_att_temp_mask(self, data, mask_frame=10):
+    def motion_att_temp_mask(self, data, mask_frame=5):
 
         n, c, t, v, m = data.shape
         temp = data.clone()
@@ -122,6 +122,16 @@ class SkeletonCLR(nn.Module):
 
         return output
 
+    def temp_mask(self, data, mask_frame):
+        x = data.clone()
+        n, c, t, v, m = x.shape
+        remain_num = t - mask_frame*2
+        remain_frame = random.sample(range(t), remain_num)
+        remain_frame.sort()
+        x = x[:, :, remain_frame, :, :]
+
+        return x
+
     def forward(self, im_q, im_k=None, view='joint', cross=False, topk=1, context=False):
         """
         Input:
@@ -132,7 +142,8 @@ class SkeletonCLR(nn.Module):
             return self.encoder_q(im_q)
         ignore_joint = self.central_spacial_mask(mask_joint=10)
 
-        q1 = self.encoder_q(im_q)  # queries: NxC
+        input_q = self.motion_att_temp_mask(im_q)
+        q1 = self.encoder_q(input_q)  # queries: NxC
         q1 = F.normalize(q1, dim=1)
         with torch.no_grad():  # no gradient to keys
             self._momentum_update_key_encoder()  # update the key encoder
@@ -153,7 +164,7 @@ class SkeletonCLR(nn.Module):
         l_neg = torch.einsum('nc,ck->nk', [q2, self.queue.clone().detach()])
         logits = torch.cat([l_pos, l_neg], dim=1)
         logits /= self.T
-        logit_1 = logits  
+        logit_1 = logits
 
         labels = torch.zeros(logits.shape[0], dtype=torch.long).cuda()
         self._dequeue_and_enqueue(k1)
