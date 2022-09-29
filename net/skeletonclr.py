@@ -158,7 +158,7 @@ class SkeletonCLR(nn.Module):
         logit_0 = logits
 
         # Tempral Mask
-        input_q = self.temp_mask(im_q, mask_frame=6)
+        input_q = self.temp_mask(im_q, mask_frame=10)
         q2 = self.encoder_q(input_q)
         q2 = F.normalize(q2, dim=1)
         l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
