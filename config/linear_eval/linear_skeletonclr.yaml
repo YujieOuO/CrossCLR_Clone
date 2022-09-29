@@ -1,6 +1,6 @@
-work_dir: work/result/41
+work_dir: work/result/42
 
-weights: /mnt/lustre/zhouyujie/CrossCLR_Clone/work/pretrain41/epoch150_model.pt
+weights: /mnt/lustre/zhouyujie/CrossCLR_Clone/work/pretrain42/epoch150_model.pt
 
 ignore_weights: [encoder_q.fc, encoder_q_motion.fc, encoder_q_bone.fc, encoder_k, encoder_k_motion, encoder_k_bone, queue, queue_motion, queue_bone]
 
