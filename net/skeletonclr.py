@@ -124,6 +124,7 @@ class SkeletonCLR(nn.Module):
 
     def temp_mask(self, data, mask_frame):
 
+        x = data.clone()
         n, c, t, v, m = x.shape
         remain_num = t - mask_frame
         remain_frame = random.sample(range(t), remain_num)
