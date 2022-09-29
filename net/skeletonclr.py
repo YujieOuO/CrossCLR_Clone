@@ -123,14 +123,14 @@ class SkeletonCLR(nn.Module):
         return output
 
     def temp_mask(self, data, mask_frame):
-        x = data.clone()
+
         n, c, t, v, m = x.shape
         remain_num = t - mask_frame
         remain_frame = random.sample(range(t), remain_num)
         remain_frame.sort()
-        x = x[:, :, remain_frame, :, :]
+        out = x[:, :, remain_frame, :, :]
 
-        return x
+        return out
 
     def forward(self, im_q, im_k=None, view='joint', cross=False, topk=1, context=False):
         """
@@ -140,10 +140,9 @@ class SkeletonCLR(nn.Module):
         """
         if not self.pretrain:
             return self.encoder_q(im_q)
-        ignore_joint = self.central_spacial_mask(mask_joint=10)
+        # ignore_joint = self.central_spacial_mask(mask_joint=10)
 
-        input_q = self.temp_mask(im_q, mask_frame=10)
-        q1 = self.encoder_q(input_q)  # queries: NxC
+        q1 = self.encoder_q(im_q)  # queries: NxC
         q1 = F.normalize(q1, dim=1)
         with torch.no_grad():  # no gradient to keys
             self._momentum_update_key_encoder()  # update the key encoder
@@ -157,17 +156,18 @@ class SkeletonCLR(nn.Module):
         logits /= self.T
         logit_0 = logits
 
-        # CSM
-        # q2 = self.encoder_q(im_q, ignore_joint)
-        # q2 = F.normalize(q2, dim=1)
-        # l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
-        # l_neg = torch.einsum('nc,ck->nk', [q2, self.queue.clone().detach()])
-        # logits = torch.cat([l_pos, l_neg], dim=1)
-        # logits /= self.T
-        # logit_1 = logits
+        # Tempral Mask
+        input_q = self.temp_mask(im_q, mask_frame=6)
+        q2 = self.encoder_q(input_q)
+        q2 = F.normalize(q2, dim=1)
+        l_pos = torch.einsum('nc,nc->n', [q2, k1]).unsqueeze(-1)
+        l_neg = torch.einsum('nc,ck->nk', [q2, self.queue.clone().detach()])
+        logits = torch.cat([l_pos, l_neg], dim=1)
+        logits /= self.T
+        logit_1 = logits
 
         labels = torch.zeros(logits.shape[0], dtype=torch.long).cuda()
         self._dequeue_and_enqueue(k1)
 
-        return logit_0, labels
-        # return logit_0, logit_1, labels
+        # return logit_0, labels
+        return logit_0, logit_1, labels
