@@ -125,7 +125,7 @@ class SkeletonCLR(nn.Module):
     def temp_mask(self, data, mask_frame):
         x = data.clone()
         n, c, t, v, m = x.shape
-        remain_num = t - mask_frame*2
+        remain_num = t - mask_frame
         remain_frame = random.sample(range(t), remain_num)
         remain_frame.sort()
         x = x[:, :, remain_frame, :, :]
@@ -142,7 +142,7 @@ class SkeletonCLR(nn.Module):
             return self.encoder_q(im_q)
         ignore_joint = self.central_spacial_mask(mask_joint=10)
 
-        input_q = self.motion_att_temp_mask(im_q, mask_frame=10)
+        input_q = self.temp_mask(im_q, mask_frame=4)
         q1 = self.encoder_q(input_q)  # queries: NxC
         q1 = F.normalize(q1, dim=1)
         with torch.no_grad():  # no gradient to keys
